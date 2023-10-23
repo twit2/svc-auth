@@ -2,6 +2,7 @@ import { configDotenv } from 'dotenv';
 import express, { Request, Response } from 'express';
 import mongoose, { Mongoose } from 'mongoose';
 import cache from 'ts-cache-mongoose';
+import { CredentialModel } from './models/CredentialModel';
 
 // Load ENV parameters
 configDotenv();
@@ -38,6 +39,9 @@ async function main() {
         return;
     }
 
+    // Init models
+    await CredentialModel.init();
+
     // Listen at the port
     app.listen(port, () => {
         console.log(`Service active at port ${port}`);
@@ -45,4 +49,3 @@ async function main() {
 }
 
 main()
-    .catch(()=>process.exit(1));
