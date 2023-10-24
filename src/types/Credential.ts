@@ -17,6 +17,7 @@ export enum CredHashAlgo {
  * Represents a user credential.
  */
 export interface Credential {
+    username: string;
     ownerId: string;
     hashType: CredHashAlgo;
     hashVal: string;

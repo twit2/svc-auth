@@ -3,6 +3,8 @@ import express, { Request, Response } from 'express';
 import mongoose, { Mongoose } from 'mongoose';
 import cache from 'ts-cache-mongoose';
 import { CredentialModel } from './models/CredentialModel';
+import { createClient } from 'redis';
+import { createCredential, verifyCredential } from './CredMgr';
 
 // Load ENV parameters
 configDotenv();
@@ -11,6 +13,10 @@ configDotenv();
 // ------------------------------------------------
 const app = express();
 const port = process.env.HTTP_PORT || 3000;
+
+let redisClient = createClient({
+    url: process.env.REDIS_URL,
+});
 
 app.use(express.json());
 
@@ -36,6 +42,15 @@ async function main() {
         console.log(`Connected to database.`);
     } catch(e) {
         console.error("Cannot connect to database server.");
+        return;
+    }
+
+    try {
+        console.log(`Connecting to redis...`);
+        redisClient.once("error", (error) => console.error(`Error : ${error}`));
+        await redisClient.connect();
+    } catch(e) {
+        console.error("Cannot connect to the redis server.");
         return;
     }
 
