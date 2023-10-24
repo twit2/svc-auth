@@ -1,10 +1,13 @@
 import { configDotenv } from 'dotenv';
 import express, { Request, Response } from 'express';
 import mongoose, { Mongoose } from 'mongoose';
-import cache from 'ts-cache-mongoose';
 import { CredentialModel } from './models/CredentialModel';
 import { createClient } from 'redis';
-import { createCredential, createJwt, verifyCredential } from './CredMgr';
+import { handleLogin } from './routes/Login';
+import { handleRegister } from './routes/Register';
+import { handleVerify } from './routes/Verify';
+import { body } from 'express-validator';
+import { Limits } from '@twit2/std-library';
 
 // Load ENV parameters
 configDotenv();
@@ -20,11 +23,25 @@ let redisClient = createClient({
 
 app.use(express.json());
 
+// Validators
+// ------------------------------------------------
+
+const usernameValidator = ()=>body('username')
+    .notEmpty()
+    .isString()
+    .isLength({ min: Limits.uam.username.min, max: Limits.uam.username.max });
+
+const passwordValidator = ()=>body('password')
+    .notEmpty()
+    .isString()
+    .isLength({ min: Limits.uam.password.min, max: Limits.uam.password.max });
+
 // Routes
 // ------------------------------------------------
-app.get('/', (req: Request, res: Response) => {
-    res.send({ test: true });
-});
+
+app.post('/login', usernameValidator, passwordValidator, handleLogin);
+app.post('/register', handleRegister);
+app.post('/verify', handleVerify);
 
 /**
  * Main entry point for program.
@@ -46,14 +63,14 @@ async function main() {
     }
 
     // Connect to redis
-    try {
-        console.log(`Connecting to redis...`);
-        redisClient.once("error", (error) => console.error(`Error : ${error}`));
-        await redisClient.connect();
-    } catch(e) {
-        console.error("Cannot connect to the redis server.");
-        return;
-    }
+    // try {
+    //     console.log(`Connecting to redis...`);
+    //     redisClient.once("error", (error) => console.error(`Error : ${error}`));
+    //     await redisClient.connect();
+    // } catch(e) {
+    //     console.error("Cannot connect to the redis server.");
+    //     return;
+    // }
 
     // Init models
     await CredentialModel.init();

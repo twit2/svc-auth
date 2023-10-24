@@ -4,7 +4,6 @@ import { CredentialModel } from "./models/CredentialModel";
 import { createCredential, createJwt, verifyCredential, verifyJwt } from "./CredMgr";
 import { CredentialInsertOp } from "./op/CredentialInsertOp";
 import { CredHashAlgo, Credential } from "./types/Credential";
-import * as njwt from 'njwt';
 
 describe('credential manager tests', () => {
     let mongoServer: MongoMemoryServer;
