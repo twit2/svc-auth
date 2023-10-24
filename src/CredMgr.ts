@@ -2,6 +2,11 @@ import { compare, hash } from 'bcrypt';
 import { CredentialModel } from './models/CredentialModel';
 import { CredentialInsertOp } from './op/CredentialInsertOp';
 import { CredHashAlgo, Credential } from './types/Credential';
+import * as njwt from 'njwt';
+import { randomBytes } from 'crypto';
+
+// JWT signing key
+const jwtSignKey = randomBytes(256);
 
 /**
  * Creates a new credential.
@@ -61,4 +66,27 @@ export async function verifyCredential(ownerId: string, password: string): Promi
         case CredHashAlgo.BCrypt:
             return await compare(password, cred.hashVal);
     }
+}
+
+/**
+ * Generates a new JWT for the specified credential.
+ * @param ownerId The owner of the credential to find.
+ */
+export async function createJwt(ownerId: string): Promise<string> {
+    const cred = await CredentialModel.findOne({ ownerId: ownerId }).exec();
+
+    if(!cred)
+        throw new Error("Credential not found for owner.");
+
+    // Generate jwt    
+    const claims = {
+        iss: "twit2-auth",
+        sub: ownerId,
+        scope: "self"
+    };
+
+    const tok = njwt.create(claims, jwtSignKey);
+    tok.setExpiration(new Date().getTime() + 60*1000);
+
+    return tok.toString();
 }

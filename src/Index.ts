@@ -4,7 +4,7 @@ import mongoose, { Mongoose } from 'mongoose';
 import cache from 'ts-cache-mongoose';
 import { CredentialModel } from './models/CredentialModel';
 import { createClient } from 'redis';
-import { createCredential, verifyCredential } from './CredMgr';
+import { createCredential, createJwt, verifyCredential } from './CredMgr';
 
 // Load ENV parameters
 configDotenv();
@@ -45,6 +45,7 @@ async function main() {
         return;
     }
 
+    // Connect to redis
     try {
         console.log(`Connecting to redis...`);
         redisClient.once("error", (error) => console.error(`Error : ${error}`));

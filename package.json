@@ -18,7 +18,7 @@
     "express": "^4.18.2",
     "mongodb": "^6.0.0",
     "mongoose": "^7.5.0",
-    "njwt": "^0.4.0",
+    "njwt": "^2.0.0",
     "pug": "^3.0.2",
     "redis": "^4.6.10",
     "std-library": "github:twit2/std-library",
