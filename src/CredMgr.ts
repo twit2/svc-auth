@@ -13,9 +13,6 @@ const jwtSignKey = randomBytes(256);
  * @param c The credential to create.
  */
 export async function createCredential(op: CredentialInsertOp): Promise<Credential> {
-    if(!op.ownerId)
-        throw new Error(`No owner ID specified.`);
-
     // Avoid overflow and empty password
     if((op.password.trim() == "") || (op.password.length > 64))
         throw new Error(`Invalid password specified.`);
@@ -57,8 +54,8 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
  * @param ownerId The ID of the owner to fetch the credential for.
  * @param password The password to verify against.
  */
-export async function verifyCredential(ownerId: string, password: string): Promise<boolean> {
-    const cred = await CredentialModel.findOne({ ownerId: ownerId }).exec();
+export async function verifyCredential(username: string, password: string): Promise<boolean> {
+    const cred = await CredentialModel.findOne({ username }).exec();
 
     if(!cred)
         throw new Error("Credential not found for owner.");
@@ -74,10 +71,10 @@ export async function verifyCredential(ownerId: string, password: string): Promi
 
 /**
  * Generates a new JWT for the specified credential.
- * @param ownerId The owner of the credential to find.
+ * @param username The owner of the credential to find.
  */
-export async function createJwt(ownerId: string): Promise<string> {
-    const cred = await CredentialModel.findOne({ ownerId: ownerId }).exec();
+export async function createJwt(username: string): Promise<string> {
+    const cred = await CredentialModel.findOne({ username }).exec();
 
     if(!cred)
         throw new Error("Credential not found for owner.");
@@ -85,7 +82,7 @@ export async function createJwt(ownerId: string): Promise<string> {
     // Generate jwt    
     const claims = {
         iss: "twit2-auth",
-        sub: ownerId,
+        sub: cred.ownerId,
         scope: "self"
     };
 

@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { CredentialModel } from "./models/CredentialModel";
-import { createCredential } from "./CredMgr";
+import { createCredential, verifyCredential } from "./CredMgr";
 import { CredentialInsertOp } from "./op/CredentialInsertOp";
-import { Credential } from "./types/Credential";
+import { CredHashAlgo, Credential } from "./types/Credential";
 
 describe('credential manager tests', () => {
     let mongoServer: MongoMemoryServer;
@@ -15,7 +15,10 @@ describe('credential manager tests', () => {
 
         // Init models
         await CredentialModel.init();
+
+        // Set env stuff
         process.env.HASH_ALGO = "bcrypt";
+        process.env.HASH_ROUNDS = "14";
     });
 
     // Test to ensure the model rejects invalid credentials
@@ -48,6 +51,25 @@ describe('credential manager tests', () => {
 
         for(let c of creds)
             expect(c).toBeUndefined();
+    });
+
+    // Test to ensure real credentials are properly made
+    test('cred: create basic', async() => {
+        let cred = await createCredential({
+            username: "hello",
+            ownerId: "0",
+            password: "testing12345"
+        });
+
+        expect(cred.hashVal).not.toBe('');
+        expect(cred.lastUpdated).not.toBeUndefined();
+        expect(cred.ownerId).not.toBe('');
+        expect(cred.hashType).toBe(CredHashAlgo.BCrypt);
+    });
+
+    // Checks if we can lookup and verify a credential
+    test('cred: lookup and verify', async() =>{
+        expect(await verifyCredential("hello", "testing12345")).toBe(true);
     });
 
     afterAll(async() => {
