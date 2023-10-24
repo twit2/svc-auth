@@ -91,3 +91,12 @@ export async function createJwt(username: string): Promise<string> {
 
     return tok.toString();
 }
+
+/**
+ * Verifies a JWT.
+ * @param jwtStr The JWT string.
+ * @returns The verified JWT token.
+ */
+export function verifyJwt(jwtStr: string): njwt.Jwt | undefined {
+    return njwt.verify(jwtStr, jwtSignKey);
+}

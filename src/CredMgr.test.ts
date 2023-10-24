@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { CredentialModel } from "./models/CredentialModel";
-import { createCredential, verifyCredential } from "./CredMgr";
+import { createCredential, createJwt, verifyCredential, verifyJwt } from "./CredMgr";
 import { CredentialInsertOp } from "./op/CredentialInsertOp";
 import { CredHashAlgo, Credential } from "./types/Credential";
+import * as njwt from 'njwt';
 
 describe('credential manager tests', () => {
     let mongoServer: MongoMemoryServer;
@@ -70,6 +71,26 @@ describe('credential manager tests', () => {
     // Checks if we can lookup and verify a credential
     test('cred: lookup and verify', async() =>{
         expect(await verifyCredential("hello", "testing12345")).toBe(true);
+    });
+
+    // This test must fail
+    test('cred: reject invalid user for jwt creation', async() => {
+        let jwt;
+
+        try {
+            jwt = await createJwt("invalid_user");
+        } catch(e) {
+            // Success
+            return;
+        }
+
+        expect(jwt).toBeUndefined(); // Manual fail
+    });
+
+    // Creates the cred JWT and validates it
+    test('cred: create and validate jwt for valid user', async() => {
+        const jwt = await createJwt("hello");
+        expect(verifyJwt(jwt)).not.toBe(undefined);
     });
 
     afterAll(async() => {
