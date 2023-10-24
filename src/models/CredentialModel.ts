@@ -8,6 +8,12 @@ export const CredentialModel = mongoose.model<Credential>('credential', new mong
         min: 2,
         max: 32
     },
+    username: {
+        type: String,
+        required: true,
+        min: 2,
+        max: 32
+    },
     hashType: { 
         type: Number,
         required: true,

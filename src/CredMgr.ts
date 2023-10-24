@@ -16,6 +16,10 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
     if(!op.ownerId)
         throw new Error(`No owner ID specified.`);
 
+    // Avoid overflow and empty password
+    if((op.password.trim() == "") || (op.password.length > 64))
+        throw new Error(`Invalid password specified.`);
+
     const prevCred = await CredentialModel.findOne({ ownerId: op.ownerId }).exec();
 
     if(prevCred)
