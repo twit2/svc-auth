@@ -1,13 +1,12 @@
 import { configDotenv } from 'dotenv';
 import express, { Request, Response } from 'express';
-import mongoose, { Mongoose } from 'mongoose';
-import { CredentialModel } from './models/CredentialModel';
 import { createClient } from 'redis';
 import { handleLogin } from './routes/Login';
 import { handleRegister } from './routes/Register';
 import { handleVerify } from './routes/Verify';
 import { body } from 'express-validator';
 import { Limits } from '@twit2/std-library';
+import { CredStore } from './CredStore';
 
 // Load ENV parameters
 configDotenv();
@@ -47,20 +46,7 @@ app.post('/verify', handleVerify);
  * Main entry point for program.
  */
 async function main() {
-    if(process.env.DB_URL == null) {
-        console.error("No database URL defined - is your .env file correct?");
-        return;
-    }
-
-    // Connect to database
-    try {
-        console.log(`Connecting to ${process.env.DB_URL}...`);
-        await mongoose.connect(`${process.env.DB_URL}/${process.env.DB_NAME}`);
-        console.log(`Connected to database.`);
-    } catch(e) {
-        console.error("Cannot connect to database server.");
-        return;
-    }
+    await CredStore.init();
 
     // Connect to redis
     // try {
@@ -71,9 +57,6 @@ async function main() {
     //     console.error("Cannot connect to the redis server.");
     //     return;
     // }
-
-    // Init models
-    await CredentialModel.init();
 
     // Listen at the port
     app.listen(port, () => {

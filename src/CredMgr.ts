@@ -1,9 +1,9 @@
 import { compare, hash } from 'bcrypt';
-import { CredentialModel } from './models/CredentialModel';
 import { CredentialInsertOp } from './op/CredentialInsertOp';
 import { CredHashAlgo, Credential } from './types/Credential';
 import * as njwt from 'njwt';
 import { randomBytes } from 'crypto';
+import { CredStore } from './CredStore';
 
 // JWT signing key
 const jwtSignKey = randomBytes(256);
@@ -17,7 +17,7 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
     if((op.password.trim() == "") || (op.password.length > 64))
         throw new Error(`Invalid password specified.`);
 
-    const prevCred = await CredentialModel.findOne({ ownerId: op.ownerId }).exec();
+    const prevCred = await CredStore.findCredByOwnerId(op.ownerId);
 
     if(prevCred)
         throw new Error("Credential for owner already exists.");
@@ -45,7 +45,7 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
     };
 
     // Do db op
-    await new CredentialModel(cred).save();
+    await CredStore.createCred(cred);
     return cred;
 }
 
@@ -55,7 +55,7 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
  * @param password The password to verify against.
  */
 export async function verifyCredential(username: string, password: string): Promise<boolean> {
-    const cred = await CredentialModel.findOne({ username }).exec();
+    const cred = await CredStore.findCredByUName(username);
 
     if(!cred)
         throw new Error("Credential not found for owner.");
@@ -74,7 +74,7 @@ export async function verifyCredential(username: string, password: string): Prom
  * @param username The owner of the credential to find.
  */
 export async function createJwt(username: string): Promise<string> {
-    const cred = await CredentialModel.findOne({ username }).exec();
+    const cred = await CredStore.findCredByUName(username);
 
     if(!cred)
         throw new Error("Credential not found for owner.");
