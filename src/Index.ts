@@ -3,8 +3,6 @@ import express, { Request, Response } from 'express';
 import { handleLogin } from './routes/Login';
 import { handleRegister } from './routes/Register';
 import { handleVerify } from './routes/Verify';
-import { body } from 'express-validator';
-import { Limits } from '@twit2/std-library';
 import { CredStore } from './CredStore';
 import { CredWorker } from './CredWorker';
 

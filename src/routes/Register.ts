@@ -43,6 +43,7 @@ export async function handleRegister(req: Request, res: Response, next: NextFunc
         const jwt = await createJwt(userAcc.username);
         res.end(JSON.stringify(APIRespConstructor.success(jwt)));
     } catch(e) {
+        res.statusCode = 400;
         res.end(JSON.stringify(APIRespConstructor.fail(APIResponseCodes.GENERIC, ((e as Error).message) || "<no information>")));
     }
 }
