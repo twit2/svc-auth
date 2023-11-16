@@ -18,23 +18,10 @@ const port = process.env.HTTP_PORT || 3000;
 
 app.use(express.json());
 
-// Validators
-// ------------------------------------------------
-
-const usernameValidator = ()=>body('username')
-    .notEmpty()
-    .isString()
-    .isLength({ min: Limits.uam.username.min, max: Limits.uam.username.max });
-
-const passwordValidator = ()=>body('password')
-    .notEmpty()
-    .isString()
-    .isLength({ min: Limits.uam.password.min, max: Limits.uam.password.max });
-
 // Routes
 // ------------------------------------------------
 
-app.post('/login', usernameValidator, passwordValidator, handleLogin);
+app.post('/login', handleLogin);
 app.post('/register', handleRegister);
 app.post('/verify', handleVerify);
 
