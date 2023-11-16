@@ -7,5 +7,5 @@ import { NextFunction, Request, Response } from "express";
  * @param next Next function.
  */
 export function handleLogin(req: Request, res: Response, next: NextFunction) {
-    
+    console.log("Debug");
 }

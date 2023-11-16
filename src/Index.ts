@@ -16,10 +16,6 @@ configDotenv();
 const app = express();
 const port = process.env.HTTP_PORT || 3000;
 
-let redisClient = createClient({
-    url: process.env.REDIS_URL,
-});
-
 app.use(express.json());
 
 // Validators

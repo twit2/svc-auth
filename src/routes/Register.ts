@@ -7,5 +7,5 @@ import { NextFunction, Request, Response } from "express";
  * @param next Next function.
  */
 export function handleRegister(req: Request, res: Response, next: NextFunction) {
-    
+    res.send({success: true});
 }
