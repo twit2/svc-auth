@@ -36,7 +36,8 @@ export async function handleLogin(req: Request, res: Response, next: NextFunctio
         if(await verifyCredential(credVerifyOp.username, credVerifyOp.password)) {
             const jwt = await createJwt(credVerifyOp.username);
             res.end(JSON.stringify(APIRespConstructor.success(jwt)));
-        }
+        } else
+            throw new Error("Invalid credentials.");
     } catch(e) {
         res.end(JSON.stringify(APIRespConstructor.fail(APIResponseCodes.GENERIC, ((e as Error).message) || "<no information>")));
     }
