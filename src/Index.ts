@@ -1,12 +1,12 @@
 import { configDotenv } from 'dotenv';
 import express, { Request, Response } from 'express';
-import { createClient } from 'redis';
 import { handleLogin } from './routes/Login';
 import { handleRegister } from './routes/Register';
 import { handleVerify } from './routes/Verify';
 import { body } from 'express-validator';
 import { Limits } from '@twit2/std-library';
 import { CredStore } from './CredStore';
+import { CredWorker } from './CredWorker';
 
 // Load ENV parameters
 configDotenv();
@@ -43,16 +43,7 @@ app.post('/verify', handleVerify);
  */
 async function main() {
     await CredStore.init();
-
-    // Connect to redis
-    // try {
-    //     console.log(`Connecting to redis...`);
-    //     redisClient.once("error", (error) => console.error(`Error : ${error}`));
-    //     await redisClient.connect();
-    // } catch(e) {
-    //     console.error("Cannot connect to the redis server.");
-    //     return;
-    // }
+    await CredWorker.init(process.env.MQ_URL as string);
 
     // Listen at the port
     app.listen(port, () => {
