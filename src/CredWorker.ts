@@ -12,7 +12,7 @@ async function init(url: string) {
 
     // Setup RPC server for session validation
     const server = new MsgQueue.rpc.RPCServer(mq);
-    await server.init('session-verification');
+    await server.init('t2a-session-verif');
 
     // Initialize RPC session verifier.
     RPCSessionVerifier.init(server);
