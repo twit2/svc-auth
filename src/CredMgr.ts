@@ -19,7 +19,16 @@ let userRPC : RPCClient;
 export async function prepareUserRPC(mq: MsgQueueProvider) {
     console.log("Prepping user service RPC...");
     userRPC = new RPCClient(mq);
-    await userRPC.init('user-service');
+    await userRPC.init('t2-user-service');
+}
+
+/**
+ * Checks whether the specified owner has a credential.
+ * @param ownerId The owner ID to check against.
+ */
+export async function hasCredential(ownerId: string) {
+    const prevCred = await CredStore.findCredByOwnerId(ownerId);
+    return prevCred != null;
 }
 
 /**
