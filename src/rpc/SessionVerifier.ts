@@ -1,6 +1,10 @@
 import { RPCServer } from "@twit2/std-library/dist/comm/rpc/RPCServer";
 import { verifyJwt } from "../CredMgr";
 
+interface BodyWithSub {
+    sub: string;
+}
+
 /**
  * Initializes the session verifier RPC server.
  * @param server The RPC server to initialize. 
@@ -14,12 +18,15 @@ function init(server: RPCServer) {
 
             try {
                 const jwt = verifyJwt(token);
+                let jwtBody = jwt?.body as unknown as BodyWithSub;
                 
                 if(!jwt) {
                     throw new Error("Access denied.");
                 }
                 else {
-                    return true;
+                    return {
+                        id: jwtBody.sub
+                    };
                 }
             } catch(e) {
                 throw e;
