@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { CredentialModel } from "./models/CredentialModel";
-import { createCredential, createJwt, verifyCredential, verifyJwt } from "./CredMgr";
+import { createCredential, createJwt, prepareUserRPC, verifyCredential, verifyJwt } from "./CredMgr";
 import { CredentialInsertOp } from "./op/CredentialInsertOp";
 import { CredHashAlgo, Credential } from "./types/Credential";
+import { NullMqProvider } from "@twit2/std-library/dist/comm/providers/NullMqProvider";
+import { RPCServer } from "@twit2/std-library/dist/comm/rpc/RPCServer";
 
 describe('credential manager tests', () => {
     let mongoServer: MongoMemoryServer;
@@ -16,6 +18,21 @@ describe('credential manager tests', () => {
         // Init models
         await CredentialModel.init();
 
+        // Setup fake rpc
+        // We are not testing the user service here :)
+        const mq = new NullMqProvider({
+            testMode: true
+        });
+        const rpcs = new RPCServer(mq);
+        await rpcs.init("user-service");
+
+        rpcs.defineProcedure({
+            name: 'create-profile',
+            callback: async(data)=> { return {}; }
+        });
+
+        await prepareUserRPC(mq);
+
         // Set env stuff
         process.env.HASH_ALGO = "bcrypt";
         process.env.HASH_ROUNDS = "14";
@@ -27,18 +44,11 @@ describe('credential manager tests', () => {
 
         let credOps : CredentialInsertOp[] = [
             {
-                username: "testing",
-                ownerId: null as unknown as string,
-                password: "testing12345"
-            },
-            {
                 username: "",
-                ownerId: "0",
                 password: "testing12345"
             },
             {
                 username: "test",
-                ownerId: "0",
                 password: ""
             }
         ];
@@ -57,7 +67,6 @@ describe('credential manager tests', () => {
     test('cred: create basic', async() => {
         let cred = await createCredential({
             username: "hello",
-            ownerId: "0",
             password: "testing12345"
         });
 
