@@ -4,9 +4,23 @@ import { CredHashAlgo, Credential } from './types/Credential';
 import * as njwt from 'njwt';
 import { randomBytes } from 'crypto';
 import { CredStore } from './CredStore';
+import { MsgQueueProvider } from '@twit2/std-library/dist/comm/MsgQueueProvider';
+import { RPCClient } from '@twit2/std-library/dist/comm/rpc/RPCClient';
+import { generateId } from '@twit2/std-library';
 
 // JWT signing key
 const jwtSignKey = randomBytes(256);
+
+let userRPC : RPCClient;
+
+/**
+ * Prepares the user RPC client.
+ */
+export async function prepareUserRPC(mq: MsgQueueProvider) {
+    console.log("Prepping user service RPC...");
+    userRPC = new RPCClient(mq);
+    await userRPC.init('user-service');
+}
 
 /**
  * Creates a new credential.
@@ -17,7 +31,7 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
     if((op.password.trim() == "") || (op.password.length > 64))
         throw new Error(`Invalid password specified.`);
 
-    const prevCred = await CredStore.findCredByOwnerId(op.ownerId);
+    const prevCred = await CredStore.findCredByUName(op.username);
 
     if(prevCred)
         throw new Error("Credential for owner already exists.");
@@ -35,10 +49,12 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
             break;
     }
 
+    const userId = generateId({ workerId: process.pid, procId: process.ppid });
+
     // Construct cred object
     const cred : Credential = {
         username: op.username,
-        ownerId: op.ownerId,
+        ownerId: userId,
         hashType,
         hashVal,
         lastUpdated: new Date()
@@ -46,6 +62,21 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
 
     // Do db op
     await CredStore.createCred(cred);
+
+    // Ask user service nicely for a fresh profile
+    try {
+        const profile = await userRPC.makeCall("create-profile", { username: op.username, id: userId });
+
+        if(!profile)
+            throw new Error("No profile created.");
+
+        console.log(profile);
+    } catch(e) {
+        console.error("Can't create user profile!");
+        console.error(e);
+        throw e;
+    }
+
     return cred;
 }
 

@@ -5,6 +5,7 @@ import { handleRegister } from './routes/Register';
 import { handleVerify } from './routes/Verify';
 import { CredStore } from './CredStore';
 import { CredWorker } from './CredWorker';
+import { ErrorHandlingMiddleware } from '@twit2/std-library';
 
 // Load ENV parameters
 configDotenv();
@@ -22,6 +23,8 @@ app.use(express.json());
 app.post('/login', handleLogin);
 app.post('/register', handleRegister);
 app.post('/verify', handleVerify);
+
+app.use(ErrorHandlingMiddleware.handle);
 
 /**
  * Main entry point for program.

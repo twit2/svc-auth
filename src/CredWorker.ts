@@ -1,6 +1,7 @@
 import { RabbitMQQueueProvider } from "@twit2/std-library/dist/comm/providers/RabbitMqProvider"
 import { MsgQueue } from "@twit2/std-library";
 import { RPCSessionVerifier } from "./rpc/SessionVerifier";
+import { prepareUserRPC } from "./CredMgr";
 
 /**
  * Initializes the credential worker.
@@ -16,6 +17,8 @@ async function init(url: string) {
 
     // Initialize RPC session verifier.
     RPCSessionVerifier.init(server);
+
+    await prepareUserRPC(mq);
 }
 
 export const CredWorker = {

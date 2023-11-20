@@ -35,8 +35,7 @@ export async function handleRegister(req: Request, res: Response, next: NextFunc
     try {
         const userAcc = await createCredential({
             username: credRegOp.username,
-            password: credRegOp.password,
-            ownerId: generateId({ workerId: process.pid, procId: process.ppid })
+            password: credRegOp.password
         })
         
         // Create JWT.
