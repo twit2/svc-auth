@@ -118,7 +118,7 @@ export async function createJwt(username: string): Promise<string> {
     };
 
     const tok = njwt.create(claims, jwtSignKey);
-    tok.setExpiration(new Date().getTime() + 60*10000);
+    tok.setExpiration(new Date().getTime() + 60*100000);
 
     return tok.toString();
 }
