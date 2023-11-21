@@ -17,10 +17,13 @@ function init(server: RPCServer) {
                 throw new Error("No token specified.");
 
             try {
+                // console.log(`DEBUG Verify: ${token}`); 
                 const jwt = verifyJwt(token);
                 let jwtBody = jwt?.body as unknown as BodyWithSub;
                 
                 if(!jwt) {
+                    // console.log(`Debug fail`);
+                    console.log(jwtBody);
                     throw new Error("Access denied.");
                 }
                 else {
