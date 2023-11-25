@@ -6,6 +6,7 @@ import { handleVerify } from './routes/Verify';
 import { CredStore } from './CredStore';
 import { CredWorker } from './CredWorker';
 import { ErrorHandlingMiddleware } from '@twit2/std-library';
+require('express-async-errors');
 
 // Load ENV parameters
 configDotenv();
