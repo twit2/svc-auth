@@ -20,9 +20,7 @@ describe('credential manager tests', () => {
 
         // Setup fake rpc
         // We are not testing the user service here :)
-        const mq = new NullMqProvider({
-            testMode: true
-        });
+        const mq = new NullMqProvider();
         const rpcs = new RPCServer(mq);
         await rpcs.init("user-service");
 
