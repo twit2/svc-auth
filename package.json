@@ -8,7 +8,8 @@
     "start": "ts-node src/Index.ts",
     "dev": "npx nodemon src/Index.ts",
     "build": "tsc",
-    "serve": "node dist/Index.js"
+    "serve": "node dist/Index.js",
+    "test-coverage": "npx jest --coverage"
   },
   "author": "",
   "license": "ISC",
