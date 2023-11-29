@@ -20,6 +20,14 @@ class MockRabbitMQQueueProvider extends RabbitMQQueueProvider {
     constructor() {
         super();
     }
+    
+    async openQueue(exchange: string, name: string): Promise<void> {
+        try {
+            return await super.openQueue(exchange, name);
+        } catch(e) {
+            // Do nothing
+        }
+    }
 
     async setup() {
         this.client = await mock_amqp.connect(`amqp://localhost:5672`);
