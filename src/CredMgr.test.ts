@@ -4,7 +4,6 @@ import { CredentialModel } from "./models/CredentialModel";
 import { createCredential, createJwt, prepareUserRPC, verifyCredential, verifyJwt } from "./CredMgr";
 import { CredentialInsertOp } from "./op/CredentialInsertOp";
 import { CredHashAlgo, Credential } from "./types/Credential";
-import { NullMqProvider } from "@twit2/std-library/dist/comm/providers/NullMqProvider";
 import { RPCServer } from "@twit2/std-library/dist/comm/rpc/RPCServer";
 import { RabbitMQQueueProvider } from "@twit2/std-library/dist/comm/providers/RabbitMqProvider";
 import { GenericExchangeType, MQ_EXCG_DEFAULT } from "@twit2/std-library/dist/comm/MsgQueueProvider";
@@ -17,10 +16,6 @@ const mock_amqp = require('mock-amqplib');
  * This simply creates a mock client in place of a real one.
  */
 class MockRabbitMQQueueProvider extends RabbitMQQueueProvider {
-    constructor() {
-        super();
-    }
-    
     async openQueue(exchange: string, name: string): Promise<void> {
         try {
             return await super.openQueue(exchange, name);

@@ -51,11 +51,11 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
     let hashVal: string;
 
     switch(hashType) {
-        default:
-            throw new Error(`Hashing algorithm '${hashType}' not implemented!`);
         case CredHashAlgo.BCrypt:
             hashVal = await hash(op.password, parseInt(process.env.HASH_ROUNDS as string));
             break;
+        default:
+            throw new Error(`Hashing algorithm '${hashType}' not implemented!`);
     }
 
     const userId = generateId({ workerId: process.pid, procId: process.ppid });
@@ -102,10 +102,10 @@ export async function verifyCredential(username: string, password: string): Prom
 
     // Verify hash
     switch(cred.hashType) {
-        default:
-            throw new Error(`Hashing algorithm '${cred.hashType}' not implemented!`);
         case CredHashAlgo.BCrypt:
             return await compare(password, cred.hashVal);
+        default:
+            throw new Error(`Hashing algorithm '${cred.hashType}' not implemented!`);
     }
 }
 

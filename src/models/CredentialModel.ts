@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose'
+import mongoose from 'mongoose'
 import { CredHashAlgo, Credential } from '../types/Credential'
 import { Limits } from '@twit2/std-library';
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Ajv from "ajv";
-import { APIRespConstructor, APIResponseCodes, Limits, generateId } from "@twit2/std-library";
+import { APIRespConstructor, APIResponseCodes, Limits } from "@twit2/std-library";
 import { CredentialRegisterOp } from "../op/CredentialRegisterOp";
 import { createCredential, createJwt } from "../CredMgr";
 

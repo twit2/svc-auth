@@ -1,5 +1,5 @@
 import { configDotenv } from 'dotenv';
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { handleLogin } from './routes/Login';
 import { handleRegister } from './routes/Register';
 import { handleVerify } from './routes/Verify';
@@ -14,7 +14,7 @@ configDotenv();
 // Setup
 // ------------------------------------------------
 const app = express();
-const port = process.env.HTTP_PORT || 3000;
+const port = process.env.HTTP_PORT ?? 3000;
 
 app.use(express.json());
 
