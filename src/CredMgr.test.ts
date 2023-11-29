@@ -41,8 +41,10 @@ describe('credential manager tests', () => {
         // Setup fake rpc
         // We are not testing the user service here :)
         const mq = new MockRabbitMQQueueProvider();
+        await mq.setup();
+
         const rpcs = new RPCServer(mq);
-        await rpcs.init("user-service");
+        await rpcs.init("t2-user-service");
 
         rpcs.defineProcedure({
             name: 'create-profile',
