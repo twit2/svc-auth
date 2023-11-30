@@ -7,3 +7,6 @@
 /.env
 /server.log
 /.seed_successful
+
+# Ignore git strip
+/__gitstrip
