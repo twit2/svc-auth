@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+Dockerfile
+.dockerignore
+sonar-project.properties
+README.md
+.github
+.git
+.env
+coverage
+.gitignore
+*.test.js
