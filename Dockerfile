@@ -15,7 +15,7 @@ RUN rm tsconfig.json
 RUN rm jest.config.js
 
 # Tell docker about port
-EXPOSE 3201
+EXPOSE 3200
 
 # Serve
 CMD [ "npm", "run", "serve" ]
