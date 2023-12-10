@@ -25,7 +25,7 @@ app.use(express.json());
 app.post('/login', handleLogin);
 app.post('/register', handleRegister);
 app.post('/verify', handleVerify);
-app.post('/role', handleGetRole);
+app.get('/role', handleGetRole);
 
 app.use(ErrorHandlingMiddleware.handle);
 
