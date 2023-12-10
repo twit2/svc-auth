@@ -1,4 +1,4 @@
-import { APIRespConstructor, APIResponseCodes, T2Session, WithT2Session } from "@twit2/std-library";
+import { APIRespConstructor, APIResponseCodes, WithT2Session } from "@twit2/std-library";
 import { Request, Response, NextFunction } from "express";
 import { verifyJwt } from "../CredMgr";
 
