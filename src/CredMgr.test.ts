@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { CredentialModel } from "./models/CredentialModel";
 import { createCredential, createJwt, getCredRole, prepareUserRPC, verifyCredential, verifyJwt } from "./CredMgr";
-import { CredentialInsertOp } from "./op/CredentialInsertOp";
 import { CredHashAlgo, Credential, RoleEnum } from "./types/Credential";
 import { RPCServer } from "@twit2/std-library/dist/comm/rpc/RPCServer";
 import { RabbitMQQueueProvider } from "@twit2/std-library/dist/comm/providers/RabbitMqProvider";
