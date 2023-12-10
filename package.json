@@ -9,6 +9,7 @@
     "dev": "npx nodemon src/Index.ts",
     "build": "tsc",
     "serve": "node dist/Index.js",
+    "migrate": "node migrate.js",
     "test-coverage": "npx jest --coverage"
   },
   "author": "",

@@ -1,5 +1,5 @@
 import { RPCServer } from "@twit2/std-library/dist/comm/rpc/RPCServer";
-import { verifyJwt } from "../CredMgr";
+import { getCredRole, verifyJwt } from "../CredMgr";
 
 interface BodyWithSub {
     sub: string;
@@ -28,9 +28,19 @@ function init(server: RPCServer) {
                 };
             }
         }
+    });
+
+    server.defineProcedure({
+        name: 'get-role',
+        callback: async(id: string) => {
+            if(typeof id !== 'string')
+                throw new Error("No valid ID specified.");
+
+            return getCredRole(id);
+        }
     })
 }
 
-export const RPCSessionVerifier = {
+export const AuthRPCServer = {
     init
 }

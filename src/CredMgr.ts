@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcrypt';
 import { CredentialInsertOp } from './op/CredentialInsertOp';
-import { CredHashAlgo, Credential } from './types/Credential';
+import { CredHashAlgo, Credential, RoleEnum } from './types/Credential';
 import * as njwt from 'njwt';
 import { randomBytes } from 'crypto';
 import { CredStore } from './CredStore';
@@ -66,6 +66,7 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
         ownerId: userId,
         hashType,
         hashVal,
+        role: RoleEnum.User,
         lastUpdated: new Date()
     };
 
@@ -130,6 +131,19 @@ export async function createJwt(username: string): Promise<string> {
     tok.setExpiration(new Date().getTime() + 60*100000);
 
     return tok.toString();
+}
+
+/**
+ * Gets the credential role.
+ * @param id The ID to check.
+ */
+export async function getCredRole(id: string) {
+    const cred = await CredStore.findCredByOwnerId(id);
+
+    if(!cred)
+        throw new Error("Credential not found for owner.");
+
+    return cred.role ?? RoleEnum.User;
 }
 
 /**

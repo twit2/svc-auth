@@ -14,6 +14,17 @@ export enum CredHashAlgo {
 }
 
 /**
+ * Represents a role.
+ */
+export enum RoleEnum {
+    /** A regular user */
+    User = 0,
+
+    /** Platform administrator. Has all rights. */
+    Admin = 1
+}
+
+/**
  * Represents a user credential.
  */
 export interface Credential {
@@ -22,4 +33,5 @@ export interface Credential {
     hashType: CredHashAlgo;
     hashVal: string;
     lastUpdated: Date;
+    role?: RoleEnum;
 }

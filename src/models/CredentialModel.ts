@@ -1,8 +1,8 @@
 import mongoose from 'mongoose'
-import { CredHashAlgo, Credential } from '../types/Credential'
-import { Limits } from '@twit2/std-library';
+import { CredHashAlgo, Credential, RoleEnum } from '../types/Credential'
+import { Limits, VersionedDoc } from '@twit2/std-library';
 
-export const CredentialModel = mongoose.model<Credential>('credential', new mongoose.Schema({
+const schema = new mongoose.Schema({
     ownerId: {
         type: String,
         required: true,
@@ -14,6 +14,11 @@ export const CredentialModel = mongoose.model<Credential>('credential', new mong
         required: true,
         min: Limits.uam.username.min,
         max: Limits.uam.username.max
+    },
+    role: {
+        type: Number,
+        required: false,
+        default: RoleEnum.User
     },
     hashType: { 
         type: Number,
@@ -29,5 +34,12 @@ export const CredentialModel = mongoose.model<Credential>('credential', new mong
     lastUpdated: {
         type: Date,
         required: true
+    },
+    schemaVer: {
+        type: Number,
+        required: true,
+        default: 1
     }
-}));
+});
+
+export const CredentialModel = mongoose.model<Credential & VersionedDoc>('credential', schema);
