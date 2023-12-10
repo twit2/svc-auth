@@ -20,3 +20,8 @@ To start a nodemon server with live reload, run `npm run dev`.
 
 You can run unit tests with `npm run test`. Before making any contributions, all tests must pass!
 
+#### Migrations
+
+You may need to run migrations to ensure the data inside the database is up to date.
+
+To do this, run `npm run migrate`.
