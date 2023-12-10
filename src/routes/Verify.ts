@@ -1,6 +1,5 @@
-import { APIRespConstructor, APIResponseCodes } from "@twit2/std-library";
+import { APIRespConstructor } from "@twit2/std-library";
 import { NextFunction, Request, Response } from "express";
-import { verifyJwt } from "../CredMgr";
 
 /**
  * Handles the register route.
