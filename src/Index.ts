@@ -7,6 +7,7 @@ import { CredStore } from './CredStore';
 import { CredWorker } from './CredWorker';
 import { ErrorHandlingMiddleware } from '@twit2/std-library';
 import { handleGetRole } from './routes/Role';
+import { LocalTokenVerifier } from './middleware/LocalTokenVerifier';
 require('express-async-errors');
 
 // Load ENV parameters
@@ -24,6 +25,9 @@ app.use(express.json());
 
 app.post('/login', handleLogin);
 app.post('/register', handleRegister);
+
+app.use(LocalTokenVerifier.handle);
+
 app.post('/verify', handleVerify);
 app.get('/role', handleGetRole);
 

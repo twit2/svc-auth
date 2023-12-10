@@ -14,6 +14,7 @@ module.exports = {
         "src/types",
         "src/rpc",
         "src/Index.ts",
+        "src/middleware",
         "src/CredWorker.ts"
     ]
 };
