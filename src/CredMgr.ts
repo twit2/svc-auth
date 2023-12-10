@@ -6,7 +6,7 @@ import { randomBytes } from 'crypto';
 import { CredStore } from './CredStore';
 import { MsgQueueProvider } from '@twit2/std-library/dist/comm/MsgQueueProvider';
 import { RPCClient } from '@twit2/std-library/dist/comm/rpc/RPCClient';
-import { generateId } from '@twit2/std-library';
+import { Limits, generateId } from '@twit2/std-library';
 
 // JWT signing key
 const jwtSignKey = randomBytes(256);
@@ -37,7 +37,7 @@ export async function hasCredential(ownerId: string) {
  */
 export async function createCredential(op: CredentialInsertOp): Promise<Credential> {
     // Avoid overflow and empty password
-    if((op.password.trim() == "") || (op.password.length > 64))
+    if((op.password.length < Limits.uam.password.min) || (op.password.length > Limits.uam.password.max))
         throw new Error(`Invalid password specified.`);
 
     const prevCred = await CredStore.findCredByUName(op.username);
