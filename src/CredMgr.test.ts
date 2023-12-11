@@ -85,6 +85,10 @@ describe('credential manager tests', () => {
         expect(cred.lastUpdated).not.toBeUndefined();
     });
 
+    test('cred create: must reject invalid username', async() => {
+        await TestingUtils.mustFailAsync(async()=>{await createCredential({ username: "Test User!!!", password: "test12345" });}, "cred with invalid username was made.");
+    });
+
     test('cred create: must reject nonexistent hashing algorithm', async()=> {
         process.env.HASH_ALGO = "invalid";
         await TestingUtils.mustFailAsync(async()=>{await createCredential({ username: "testing3", password: "test12345" });}, "cred with invalid algo was made.");

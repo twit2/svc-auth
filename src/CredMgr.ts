@@ -60,6 +60,10 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
 
     const userId = generateId({ workerId: process.pid, procId: process.ppid });
 
+    // Check if username matches regex
+    if(!/^[a-zA-Z0-9_]*$/.test(op.username))
+        throw new Error("Invalid username.");
+
     // Construct cred object
     const cred : Credential = {
         username: op.username,

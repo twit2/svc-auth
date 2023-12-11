@@ -13,7 +13,8 @@ const schema = new mongoose.Schema({
         type: String,
         required: true,
         min: Limits.uam.username.min,
-        max: Limits.uam.username.max
+        max: Limits.uam.username.max,
+        validate: (v: string)=>/^[a-zA-Z0-9_]*$/.test(v)
     },
     role: {
         type: Number,
