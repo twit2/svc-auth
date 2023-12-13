@@ -1,6 +1,3 @@
-import mongoose from "mongoose";
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { CredentialModel } from "./models/CredentialModel";
 import { createCredential, createJwt, getCredRole, prepareUserRPC, verifyCredential, verifyJwt } from "./CredMgr";
 import { CredHashAlgo, Credential, RoleEnum } from "./types/Credential";
 import { RPCServer } from "@twit2/std-library/dist/comm/rpc/RPCServer";
@@ -32,18 +29,10 @@ class MockRabbitMQQueueProvider extends RabbitMQQueueProvider {
 }
 
 describe('credential manager tests', () => {
-    let mongoServer: MongoMemoryServer;
     let rpcProfCreateMode : "data"|"error"|"undefined" = "data";
     let tempJwt = "";
 
     beforeAll(async()=> {
-        // Setup server
-        mongoServer = await MongoMemoryServer.create();
-        await mongoose.connect(mongoServer.getUri(), { dbName: "t2-auth-test" });
-
-        // Init models
-        await CredentialModel.init();
-
         // Setup fake rpc
         // We are not testing the user service here :)
         const mq = new MockRabbitMQQueueProvider();
@@ -162,10 +151,5 @@ describe('credential manager tests', () => {
 
     test('cred get role: reject for invalid user', async() => {
         await TestingUtils.mustFailAsync(async()=>{await getCredRole("invalid")}, "role received.");
-    });
-
-    afterAll(async() => {
-        await mongoose.disconnect();
-        await mongoServer.stop();
     });
 });

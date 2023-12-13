@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" , "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
 
 jobs:
   # Build the source
@@ -112,6 +112,7 @@ jobs:
   publish:
     needs: sonarcloud
     name: Publish to Docker Hub
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:

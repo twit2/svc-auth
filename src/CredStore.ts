@@ -6,6 +6,7 @@ import { Credential } from "./types/Credential";
 /**
  * Initializes the credentials DAL.
  */
+/* istanbul ignore next */
 async function init() {
     if(process.env.DB_URL == null)
         throw new Error("No database URL defined - is your .env file correct?");
