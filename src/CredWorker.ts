@@ -18,7 +18,7 @@ async function init(url: string) {
     // Initialize RPC session verifier.
     AuthRPCServer.init(server);
 
-    await prepareUserRPC(mq);
+    await prepareUserRPC(new MsgQueue.rpc.RPCClient(mq));
 }
 
 export const CredWorker = {

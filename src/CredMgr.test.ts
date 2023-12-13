@@ -1,45 +1,16 @@
 import { createCredential, createJwt, getCredRole, prepareUserRPC, verifyCredential, verifyJwt } from "./CredMgr";
 import { CredHashAlgo, Credential, RoleEnum } from "./types/Credential";
-import { RPCServer } from "@twit2/std-library/dist/comm/rpc/RPCServer";
-import { RabbitMQQueueProvider } from "@twit2/std-library/dist/comm/providers/RabbitMqProvider";
-import { GenericExchangeType, MQ_EXCG_DEFAULT } from "@twit2/std-library/dist/comm/MsgQueueProvider";
 import { Limits, TestingUtils } from "@twit2/std-library";
 import { CredStore } from "./CredStore";
-
-const mock_amqp = require('mock-amqplib');
-
-/**
- * Mock rabbitmq provider.
- * 
- * This simply creates a mock client in place of a real one.
- */
-class MockRabbitMQQueueProvider extends RabbitMQQueueProvider {
-    async openQueue(exchange: string, name: string): Promise<void> {
-        try {
-            return await super.openQueue(exchange, name);
-        } catch(e) {
-            // Do nothing
-        }
-    }
-
-    async setup() {
-        this.client = await mock_amqp.connect(`amqp://localhost:5672`);
-        await this.openExchange(MQ_EXCG_DEFAULT, GenericExchangeType.direct);
-    }
-}
 
 describe('credential manager tests', () => {
     let rpcProfCreateMode : "data"|"error"|"undefined" = "data";
     let tempJwt = "";
 
     beforeAll(async()=> {
-        // Setup fake rpc
-        // We are not testing the user service here :)
-        const mq = new MockRabbitMQQueueProvider();
-        await mq.setup();
-
-        const rpcs = new RPCServer(mq);
-        await rpcs.init("t2-user-service");
+        const rpcs = new TestingUtils.mocks.RPCMock.MockRPCServer();
+        const rpcc = new TestingUtils.mocks.RPCMock.MockRPCClient();
+        rpcc.setMockServer(rpcs);
 
         rpcs.defineProcedure({
             name: 'create-profile',
@@ -55,7 +26,7 @@ describe('credential manager tests', () => {
             }
         });
 
-        await prepareUserRPC(mq);
+        await prepareUserRPC(rpcc as any);
 
         // Set env stuff
         process.env.HASH_ALGO = "bcrypt";
