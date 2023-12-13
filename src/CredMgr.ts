@@ -4,7 +4,6 @@ import { CredHashAlgo, Credential, RoleEnum } from './types/Credential';
 import * as njwt from 'njwt';
 import { randomBytes } from 'crypto';
 import { CredStore } from './CredStore';
-import { MsgQueueProvider } from '@twit2/std-library/dist/comm/MsgQueueProvider';
 import { RPCClient } from '@twit2/std-library/dist/comm/rpc/RPCClient';
 import { Limits, generateId } from '@twit2/std-library';
 
@@ -16,9 +15,9 @@ let userRPC : RPCClient;
 /**
  * Prepares the user RPC client.
  */
-export async function prepareUserRPC(mq: MsgQueueProvider) {
+export async function prepareUserRPC(rpcc: RPCClient) {
     console.log("Prepping user service RPC...");
-    userRPC = new RPCClient(mq);
+    userRPC = rpcc;
     await userRPC.init('t2-user-service');
 }
 
