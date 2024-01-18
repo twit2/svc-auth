@@ -1,4 +1,4 @@
-import { Credential } from "./types/Credential";
+import { CredHashAlgo, Credential } from "./types/Credential";
 
 const creds : Credential[] = [];
 
@@ -27,8 +27,26 @@ async function findCredByOwnerId(ownerId: string): Promise<Credential | null> {
     return creds.find(x => x.ownerId == ownerId) ?? null;
 }
 
+/**
+ * Sets a new profile password.
+ * @param ownerId The owner ID. 
+ * @param hashType The hash type.
+ * @param hashVal The hash value.
+ */
+async function setNewPassword(ownerId: string, hashType: CredHashAlgo, hashVal: string) {
+    const profile = await findCredByOwnerId(ownerId);
+
+    if(!profile)
+        throw new Error("Profile not found.");
+
+    profile.hashVal = hashVal;
+    profile.hashType = hashType;
+    return profile;
+}
+
 export const CredStoreMock = {
     createCred,
     findCredByUName,
-    findCredByOwnerId
+    findCredByOwnerId,
+    setNewPassword
 }

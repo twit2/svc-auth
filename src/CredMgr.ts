@@ -1,11 +1,13 @@
 import { compare, hash } from 'bcrypt';
 import { CredentialInsertOp } from './op/CredentialInsertOp';
 import { CredHashAlgo, Credential, RoleEnum } from './types/Credential';
-import * as njwt from 'njwt';
 import { randomBytes } from 'crypto';
 import { CredStore } from './CredStore';
 import { RPCClient } from '@twit2/std-library/dist/comm/rpc/RPCClient';
 import { Limits, generateId } from '@twit2/std-library';
+import * as njwt from 'njwt';
+import Ajv from 'ajv';
+const ajv = new Ajv();
 
 // JWT signing key
 const jwtSignKey = randomBytes(256);
@@ -31,13 +33,66 @@ export async function hasCredential(ownerId: string) {
 }
 
 /**
+ * Computes a new password hash.
+ * @param password The hash to compute.
+ * @returns The computed hash.
+ */
+export async function computePwdHash(password: string) {
+    // Only bcrypt supported right now :)
+    let hashType = (process.env.HASH_ALGO == "bcrypt") ? CredHashAlgo.BCrypt : -1;
+    let hashVal: string;
+
+    switch(hashType) {
+        case CredHashAlgo.BCrypt:
+            hashVal = await hash(password, parseInt(process.env.HASH_ROUNDS as string));
+            break;
+        default:
+            throw new Error(`Hashing algorithm '${hashType}' not implemented!`);
+    }
+
+    return {
+        hashType,
+        hashVal
+    }
+}
+
+/**
+ * Checks if the password is valid.
+ * @param password The password to validate.
+ */
+function validatePassword(password: string) {
+    if(typeof password !== 'string')
+        throw new Error('Not a string');
+
+    if((password.length < Limits.uam.password.min) || (password.length > Limits.uam.password.max))
+        throw new Error(`Invalid password specified.`);
+}
+
+/**
+ * Changes the credential password.
+ * @param ownerId The ID of the owner to change the password for.
+ * @param newPassword The new password.
+ */
+export async function changePassword(ownerId: string, newPassword: string): Promise<Credential> {
+    const prevCred = await CredStore.findCredByOwnerId(ownerId);
+
+    if(!prevCred)
+        throw new Error("Owner does not exist.");
+
+    validatePassword(newPassword);
+
+    const computedPwd = await computePwdHash(newPassword);
+    const updatedCred = await CredStore.setNewPassword(ownerId, computedPwd.hashType, computedPwd.hashVal);
+    return updatedCred;
+}
+
+/**
  * Creates a new credential.
  * @param c The credential to create.
  */
 export async function createCredential(op: CredentialInsertOp): Promise<Credential> {
     // Avoid overflow and empty password
-    if((op.password.length < Limits.uam.password.min) || (op.password.length > Limits.uam.password.max))
-        throw new Error(`Invalid password specified.`);
+    validatePassword(op.password);
 
     const prevCred = await CredStore.findCredByUName(op.username);
 
@@ -45,18 +100,7 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
         throw new Error("Credential for owner already exists.");
 
     // Do the hashing
-    // Only bcrypt supported right now :)
-    let hashType = (process.env.HASH_ALGO == "bcrypt") ? CredHashAlgo.BCrypt : -1;
-    let hashVal: string;
-
-    switch(hashType) {
-        case CredHashAlgo.BCrypt:
-            hashVal = await hash(op.password, parseInt(process.env.HASH_ROUNDS as string));
-            break;
-        default:
-            throw new Error(`Hashing algorithm '${hashType}' not implemented!`);
-    }
-
+    const hashResult = await computePwdHash(op.password);
     const userId = generateId({ workerId: process.pid, procId: process.ppid });
 
     // Check if username matches regex
@@ -67,8 +111,8 @@ export async function createCredential(op: CredentialInsertOp): Promise<Credenti
     const cred : Credential = {
         username: op.username,
         ownerId: userId,
-        hashType,
-        hashVal,
+        hashType: hashResult.hashType,
+        hashVal: hashResult.hashVal,
         role: RoleEnum.User,
         lastUpdated: new Date()
     };
