@@ -1,4 +1,4 @@
-import { createCredential, createJwt, getCredRole, prepareUserRPC, verifyCredential, verifyJwt } from "./CredMgr";
+import { changePassword, createCredential, createJwt, getCredRole, prepareUserRPC, verifyCredential, verifyJwt } from "./CredMgr";
 import { CredHashAlgo, Credential, RoleEnum } from "./types/Credential";
 import { Limits, TestingUtils } from "@twit2/std-library";
 import { CredStore } from "./CredStore";
@@ -122,5 +122,24 @@ describe('credential manager tests', () => {
 
     test('cred get role: reject for invalid user', async() => {
         await TestingUtils.mustFailAsync(async()=>{await getCredRole("invalid")}, "role received.");
+    });
+
+    test('cred pwd update: must reject non string password', async() => {
+        const cred = await CredStore.findCredByUName("testing") as Credential;
+        await TestingUtils.mustFailAsync(async()=>{await changePassword(cred.ownerId, (1234) as any)}, "password was updated as non string.");
+    });
+
+    test('cred pwd update: must reject short password', async() => {
+        const cred = await CredStore.findCredByUName("testing") as Credential;
+        await TestingUtils.mustFailAsync(async()=>{await changePassword(cred.ownerId, "a")}, "short password was provided successfully.");
+    });
+
+    test('cred pwd update: must reject long password', async() => {
+        const cred = await CredStore.findCredByUName("testing") as Credential;
+        await TestingUtils.mustFailAsync(async()=>{await changePassword(cred.ownerId, "a".repeat(Limits.uam.password.max + 1))}, "long password was provided successfully.");
+    });
+
+    test('cred pwd update: must reject change for non existent owner', async() => {
+        await TestingUtils.mustFailAsync(async()=>{await changePassword("invalid", "a".repeat(Limits.uam.password.max - 1))}, "password was updated");
     });
 });

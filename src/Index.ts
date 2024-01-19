@@ -3,6 +3,7 @@ import express from 'express';
 import { handleLogin } from './routes/Login';
 import { handleRegister } from './routes/Register';
 import { handleVerify } from './routes/Verify';
+import { handleChangePassword } from './routes/ChangePassword';
 import { CredStore } from './CredStore';
 import { CredWorker } from './CredWorker';
 import { ErrorHandlingMiddleware } from '@twit2/std-library';
@@ -30,6 +31,7 @@ app.use(LocalTokenVerifier.handle);
 
 app.post('/verify', handleVerify);
 app.get('/role', handleGetRole);
+app.patch('/password', handleChangePassword);
 
 app.use(ErrorHandlingMiddleware.handle);
 

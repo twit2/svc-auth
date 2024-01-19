@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { CredentialModel } from "./models/CredentialModel";
-import { Credential } from "./types/Credential";
+import { CredHashAlgo, Credential } from "./types/Credential";
 
 
 /**
@@ -50,9 +50,28 @@ async function findCredByOwnerId(ownerId: string): Promise<Credential | null> {
     return await CredentialModel.findOne({ ownerId }).exec();
 }
 
+/**
+ * Sets a new profile password.
+ * @param ownerId The owner ID. 
+ * @param hashType The hash type.
+ * @param hashVal The hash value.
+ */
+async function setNewPassword(ownerId: string, hashType: CredHashAlgo, hashVal: string) {
+    const profile = await CredentialModel.findOne({ ownerId });
+
+    if(!profile)
+        throw new Error("Profile not found.");
+
+    profile.hashVal = hashVal;
+    profile.hashType = hashType;
+    await profile.save();
+    return profile.toJSON();
+}
+
 export const CredStore = {
     init,
     createCred,
     findCredByUName,
-    findCredByOwnerId
+    findCredByOwnerId,
+    setNewPassword
 }
